@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useCodeStore } from '@/stores/codeStore';
 
 const Editor = () => {
-  const [code, setCode] = useState(`function greeting(name) {
-  return \`Hello, \${name}!\`;
-}
-
-const message = greeting('World');
-console.log(message);`);
-
-  const lines = code.split('\n');
-  const lineNumbers = lines.map((_, index) => index + 1);
+  const { currentFile, updateFileContent } = useCodeStore();
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCode(e.target.value);
+    if (currentFile) {
+      updateFileContent(currentFile.path, e.target.value);
+    }
   };
+
+  const lines = currentFile?.content.split('\n') || [''];
+  const lineNumbers = lines.map((_, index) => index + 1);
 
   return (
     <div className="flex-1 overflow-hidden bg-editor-bg relative">
@@ -29,8 +27,9 @@ console.log(message);`);
           ))}
         </div>
         <textarea
-          value={code}
+          value={currentFile?.content || ''}
           onChange={handleCodeChange}
+          placeholder={currentFile ? '' : 'Select a file to start editing'}
           className="flex-1 bg-transparent text-editor-text p-4 font-mono text-sm resize-none outline-none"
           spellCheck="false"
           style={{
