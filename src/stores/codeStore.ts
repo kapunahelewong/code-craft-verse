@@ -49,7 +49,7 @@ const initialFiles: FileItem[] = [
   }
 ];
 
-export const useCodeStore = create<CodeStore>((set) => ({
+export const useCodeStore = create<CodeStore>((set, get) => ({
   files: initialFiles,
   currentFile: null,
   setCurrentFile: (path) => {
@@ -64,7 +64,7 @@ export const useCodeStore = create<CodeStore>((set) => ({
       return null;
     };
     
-    const file = findFile(initialFiles);
+    const file = findFile(get().files);
     if (file && file.type === 'file') {
       set({ currentFile: file });
     }
