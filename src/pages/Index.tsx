@@ -1,11 +1,15 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from 'react';
+import TopBar from '@/components/CodeEditor/TopBar';
+import Sidebar from '@/components/CodeEditor/Sidebar';
+import Editor from '@/components/CodeEditor/Editor';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="h-screen flex flex-col bg-editor-bg text-editor-text">
+      <TopBar />
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar />
+        <Editor />
       </div>
     </div>
   );
