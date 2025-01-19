@@ -13,6 +13,8 @@ interface CodeStore {
   currentFile: FileItem | null;
   setCurrentFile: (path: string) => void;
   updateFileContent: (path: string, content: string) => void;
+  createFile: (name: string, parentPath?: string) => void;
+  createFolder: (name: string, parentPath?: string) => void;
 }
 
 const initialFiles: FileItem[] = [
@@ -95,6 +97,76 @@ export const useCodeStore = create<CodeStore>((set, get) => ({
         files: newFiles,
         currentFile: newCurrentFile,
       };
+    });
+  },
+  createFile: (name: string, parentPath?: string) => {
+    set((state) => {
+      const newPath = parentPath ? `${parentPath}/${name}` : `/${name}`;
+      const newFile: FileItem = {
+        name,
+        path: newPath,
+        type: 'file',
+        content: '',
+      };
+
+      const addFileToArray = (items: FileItem[]): FileItem[] => {
+        if (!parentPath) {
+          return [...items, newFile];
+        }
+
+        return items.map((item) => {
+          if (item.path === parentPath && item.type === 'folder') {
+            return {
+              ...item,
+              children: [...(item.children || []), newFile],
+            };
+          }
+          if (item.children) {
+            return {
+              ...item,
+              children: addFileToArray(item.children),
+            };
+          }
+          return item;
+        });
+      };
+
+      return { files: addFileToArray(state.files) };
+    });
+  },
+  createFolder: (name: string, parentPath?: string) => {
+    set((state) => {
+      const newPath = parentPath ? `${parentPath}/${name}` : `/${name}`;
+      const newFolder: FileItem = {
+        name,
+        path: newPath,
+        type: 'folder',
+        children: [],
+      };
+
+      const addFolderToArray = (items: FileItem[]): FileItem[] => {
+        if (!parentPath) {
+          return [...items, newFolder];
+        }
+
+        return items.map((item) => {
+          if (item.path === parentPath && item.type === 'folder') {
+            return {
+              ...item,
+              children: [...(item.children || []), newFolder],
+            };
+          }
+          if (item.children) {
+            return {
+              ...item,
+              children: addFolderToArray(item.children),
+            };
+          }
+          return item;
+        });
+      };
+
+      return { files: addFolderToArray(state.files) };
     });
   },
 }));
